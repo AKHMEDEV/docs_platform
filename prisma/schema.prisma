@@ -59,7 +59,7 @@ model Comment {
   // Foreign keys
   authorId   String
   documentId String
-  parentId   String? // optional for replies
+  parentId   String?
 
   // Relations
   author    User          @relation(name: "UserComments", fields: [authorId], references: [id])
