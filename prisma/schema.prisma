@@ -1,0 +1,96 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+//userRoles
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  documentations Documentation[] @relation("UserDocumentations")
+  comments       Comment[]       @relation("UserComments")
+  reactions      Reaction[]      @relation("UserReactions")
+}
+
+model Documentation {
+  id          String   @id @default(uuid()) 
+  title       String
+  content     String   @db.Text
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys
+  categoryId String
+  authorId   String
+
+  // Relations
+  category  Category   @relation(fields: [categoryId], references: [id])
+  author    User       @relation(name: "UserDocumentations", fields: [authorId], references: [id])
+  comments  Comment[]
+  reactions Reaction[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  authorId   String
+  documentId String
+  parentId   String? // optional for replies
+
+  // Relations
+  author    User          @relation(name: "UserComments", fields: [authorId], references: [id])
+  document  Documentation @relation(fields: [documentId], references: [id])
+  parent    Comment?      @relation("ReplyTo", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("ReplyTo")
+  reactions Reaction[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  documentations Documentation[]
+}
+
+model Reaction {
+  id        String       @id @default(uuid())
+  type      ReactionType
+  createdAt DateTime     @default(now())
+
+  userId     String
+  documentId String?
+  commentId  String?
+
+  // Relations
+  user     User           @relation(name: "UserReactions", fields: [userId], references: [id])
+  document Documentation? @relation(fields: [documentId], references: [id])
+  comment  Comment?       @relation(fields: [commentId], references: [id])
+}
