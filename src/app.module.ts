@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { PrismaModule } from './prisma';
 import { UserModule } from './modules/user-auth';
 import { MailModule } from './common/nodemailler';
+import { CategoryModule } from './modules/categories';
 
 @Module({
   imports: [
@@ -13,6 +13,7 @@ import { MailModule } from './common/nodemailler';
     PrismaModule,
     UserModule,
     MailModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}

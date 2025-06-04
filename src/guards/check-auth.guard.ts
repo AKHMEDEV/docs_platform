@@ -27,31 +27,37 @@ export class CheckAuthGuard implements CanActivate {
     const request = ctx.getRequest();
 
     if (!isProtected) {
-      request.role = Role.USER;
+      request.user = {
+        id: null,
+        role: Role.USER,
+      };
       return true;
     }
 
-    const authHeader =request.headers['authorization'] || request.headers['Authorization'];
+    const authHeader =
+      request.headers['authorization'] || request.headers['Authorization'];
 
     if (!authHeader || typeof authHeader !== 'string') {
-      throw new BadRequestException('Authorization header is missing');
+      throw new BadRequestException('authorization header is missing');
     }
 
     if (!authHeader.startsWith('Bearer ')) {
-      throw new BadRequestException(
-        'please send Bearer token',
-      );
+      throw new BadRequestException('bearer token yuboring');
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
       const data = await this.jwtHelper.verifyAccessToken(token);
-      request.role = data.role;
-      request.userId = data.id;
+
+      request.user = {
+        id: data.id,
+        role: data.role,
+      };
+
       return true;
     } catch (error) {
-      throw new UnauthorizedException('invalid token or token expired');
+      throw new UnauthorizedException('xato token');
     }
   }
 }

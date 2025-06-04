@@ -14,7 +14,7 @@ export class JwtHelper {
   async generateTokens(payload: { id: string; role: Role }) {
     const accessToken = await this.jwt.signAsync(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
-      expiresIn: process.env.ACCESS_TOKEN_TIME || 900,
+      expiresIn: Number(process.env.ACCESS_TOKEN_TIME) || 900,
     });
 
     const refreshToken = await this.jwt.signAsync(payload, {
@@ -25,7 +25,7 @@ export class JwtHelper {
     return {
       accessToken,
       refreshToken,
-    };
+    };  
   }
 
   async verifyAccessToken(token: string) {

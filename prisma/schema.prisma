@@ -12,6 +12,7 @@ enum Role {
   USER
   ADMIN
 }
+
 //reactions enum
 enum ReactionType {
   LIKE
@@ -19,65 +20,65 @@ enum ReactionType {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(uuid())
+  username       String
+  email          String          @unique
+  password       String
+  role           Role            @default(USER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   documentations Documentation[] @relation("UserDocumentations")
   comments       Comment[]       @relation("UserComments")
   reactions      Reaction[]      @relation("UserReactions")
 }
 
 model Documentation {
-  id          String   @id @default(uuid()) 
-  title       String
-  content     String   @db.Text
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String     @id @default(uuid())
+  title      String
+  content    String     @db.Text
+  views      Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   categoryId String
   authorId   String
-  category  Category   @relation(fields: [categoryId], references: [id])
-  author    User       @relation(name: "UserDocumentations", fields: [authorId], references: [id])
-  comments  Comment[]
-  reactions Reaction[]
+  category   Category   @relation(fields: [categoryId], references: [id])
+  author     User       @relation(name: "UserDocumentations", fields: [authorId], references: [id])
+  comments   Comment[]
+  reactions  Reaction[]
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String        @id @default(uuid())
+  content    String        @db.Text
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
   authorId   String
   documentId String
   parentId   String?
-  author    User          @relation(name: "UserComments", fields: [authorId], references: [id])
-  document  Documentation @relation(fields: [documentId], references: [id])
-  parent    Comment?      @relation("ReplyTo", fields: [parentId], references: [id])
-  replies   Comment[]     @relation("ReplyTo")
-  reactions Reaction[]
+  author     User          @relation(name: "UserComments", fields: [authorId], references: [id])
+  document   Documentation @relation(fields: [documentId], references: [id])
+  parent     Comment?      @relation("ReplyTo", fields: [parentId], references: [id])
+  replies    Comment[]     @relation("ReplyTo")
+  reactions  Reaction[]
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String          @id @default(uuid())
+  name           String          @unique
+  description    String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   documentations Documentation[]
 }
 
 model Reaction {
-  id        String       @id @default(uuid())
-  type      ReactionType
-  createdAt DateTime     @default(now())
+  id         String         @id @default(uuid())
+  type       ReactionType
+  createdAt  DateTime       @default(now())
   userId     String
   documentId String?
   commentId  String?
-  user     User           @relation(name: "UserReactions", fields: [userId], references: [id])
-  document Documentation? @relation(fields: [documentId], references: [id])
-  comment  Comment?       @relation(fields: [commentId], references: [id])
+  user       User           @relation(name: "UserReactions", fields: [userId], references: [id])
+  document   Documentation? @relation(fields: [documentId], references: [id])
+  comment    Comment?       @relation(fields: [commentId], references: [id])
 }
