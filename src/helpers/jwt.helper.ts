@@ -15,7 +15,7 @@ import {
         secret: process.env.ACCESS_TOKEN_SECRET,
         expiresIn: process.env.ACCESS_TOKEN_TIME
           ? parseInt(process.env.ACCESS_TOKEN_TIME)
-          : '1800',
+          : '3600',
       });
   
       return { token };

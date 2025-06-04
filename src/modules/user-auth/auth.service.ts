@@ -9,12 +9,14 @@ import * as bcrypt from 'bcryptjs';
 import { JwtHelper } from 'src/helpers/jwt.helper';
 import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
+import { MailService } from 'src/common/nodemailler';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtHelper: JwtHelper,
+    private readonly mailService: MailService,
   ) {}
 
   async register(payload: RegisterDto) {
@@ -33,12 +35,17 @@ export class AuthService {
         username: payload.username,
         email: payload.email,
         password: hashedPassword,
-        role: payload.role || Role.USER,
       },
     });
 
+    await this.mailService.sendMail({
+      to: user.email,
+      subject: `Welcome to [appname], ${user.username}!`,
+      text: `Hi ${user.username},\n\nThank you for registering with [appname]. We're excited to have you on board!\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nThe [appname] Team`,
+    });
+
     return {
-      message: 'you are registered successfuly',
+      message: 'success',
       data: {
         id: user.id,
         username: user.username,

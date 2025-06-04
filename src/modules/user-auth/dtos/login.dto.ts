@@ -9,7 +9,7 @@ import {
 export class LoginDto {
   @ApiProperty({
     type: 'string',
-    example: 'akhmed@gmail.com',
+    example: 'ahmadillohasanov099@gmail.com',
     required: true,
   })
   @IsEmail()
@@ -17,7 +17,7 @@ export class LoginDto {
 
   @ApiProperty({
     type: 'string',
-    example: 'akhmed123',
+    example: '0000',
     minLength: 4,
     maxLength: 20,
     required: true,

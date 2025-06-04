@@ -13,6 +13,7 @@ export class RegisterDto {
   @ApiProperty({
     example: 'tom',
   })
+  @MinLength(4)
   @IsNotEmpty()
   @IsString()
   username: string;
@@ -24,17 +25,11 @@ export class RegisterDto {
   email: string;
 
   @ApiProperty({
-    example: 'tom123456',
+    example: 'tom123',
     minLength: 4  ,
   })
   @IsNotEmpty()
   @MinLength(4)
   password: string;
 
-  @ApiPropertyOptional({
-    enum: Role,
-  })
-  @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
 }

@@ -75,8 +75,6 @@ export class UserService implements OnModuleInit {
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
-
-    // Email o'zgartirilsa, boshqa foydalanuvchi shu emailga ega emasligini tekshirish
     if (payload.email && payload.email !== existingUser.email) {
       const userWithEmail = await this.prisma.user.findUnique({
         where: { email: payload.email },
@@ -134,8 +132,8 @@ export class UserService implements OnModuleInit {
     const defaultUsers = [
       {
         username: 'akhmed',
-        email: 'akhmed@gmail.com',
-        password: 'akhmed',
+        email: 'ahmadillohasanov099@gmail.com',
+        password: '0000',
         role: Role.ADMIN,
       },
     ];
