@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
@@ -15,6 +16,7 @@ export class CheckAuthGuard implements CanActivate {
     private reflector: Reflector,
     private jwtHelper: JwtHelper,
   ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isProtected = this.reflector.getAllAndOverride<boolean>(
       PROTECTED_KEY,
@@ -29,16 +31,27 @@ export class CheckAuthGuard implements CanActivate {
       return true;
     }
 
-    const token = request.headers['authorization'];
+    const authHeader =request.headers['authorization'] || request.headers['Authorization'];
 
-    if (!token || !token.startsWith('Bearer')) {
-      throw new BadRequestException('please send Bearer token ');
+    if (!authHeader || typeof authHeader !== 'string') {
+      throw new BadRequestException('Authorization header is missing');
     }
 
-    const data = await this.jwtHelper.verifyToken(token.split(' ')[1]);
+    if (!authHeader.startsWith('Bearer ')) {
+      throw new BadRequestException(
+        'please send Bearer token',
+      );
+    }
 
-    request.role = data.role;
-    request.userId = data.id;
-    return true;
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const data = await this.jwtHelper.verifyAccessToken(token);
+      request.role = data.role;
+      request.userId = data.id;
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException('invalid token or token expired');
+    }
   }
 }

@@ -7,9 +7,9 @@ import {
 import { RegisterDto, LoginDto } from './dtos';
 import * as bcrypt from 'bcryptjs';
 import { JwtHelper } from 'src/helpers/jwt.helper';
-import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 import { MailService } from 'src/common/nodemailler';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -38,12 +38,6 @@ export class AuthService {
       },
     });
 
-    // await this.mailService.sendMail({
-    //   to: user.email,
-    //   subject: `Welcome to [appname], ${user.username}!`,
-    //   text: `Hi ${user.username},\n\nThank you for registering with [appname]. We're excited to have you on board!\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nThe [appname] Team`,
-    // });
-
     return {
       message: 'success',
       data: {
@@ -56,7 +50,7 @@ export class AuthService {
     };
   }
 
-  async login(payload: LoginDto) {
+  async login(payload: LoginDto, res: Response) {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
@@ -74,20 +68,27 @@ export class AuthService {
       throw new UnauthorizedException('invalid password');
     }
 
-    const { token } = await this.jwtHelper.generateToken({
+    const { accessToken, refreshToken } = await this.jwtHelper.generateTokens({
       id: user.id,
       role: user.role,
     });
 
-    return {
-      message: 'you are logined successfuly',
-      token,
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({
+      message: 'you are logined successfully',
+      accessToken,
       data: {
         id: user.id,
         username: user.username,
         email: user.email,
         role: user.role,
       },
-    };
+    });
   }
 }

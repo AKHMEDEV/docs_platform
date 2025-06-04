@@ -12,6 +12,7 @@ import { ROLES_KEY } from 'src/decorators';
 @Injectable()
 export class CheckRolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -20,11 +21,15 @@ export class CheckRolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const ctx = context.switchToHttp();
-    const request = ctx.getRequest();
+    if (!roles || roles.length === 0) {
+      return true;
+    }
 
-    if (!roles.includes(request.role)) {
-      throw new NotAcceptableException("do not have permission");
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user || !roles.includes(user.role)) {
+      throw new NotAcceptableException('do not have permission');
     }
 
     return true;
