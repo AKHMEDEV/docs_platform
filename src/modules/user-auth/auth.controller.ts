@@ -9,7 +9,7 @@ import { Role } from '@prisma/client';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'user royxatdan otkazish' })
+  @ApiOperation({ summary: 'users register' })
   @Post('register')
   @Protected(true)
   @Roles(Role.ADMIN, Role.USER)
@@ -17,7 +17,7 @@ export class AuthController {
     return await this.authService.register(payload);
   }
 
-  @ApiOperation({ summary: 'user tizimga kiritish' })
+  @ApiOperation({ summary: 'users login' })
   @Post('login')
   @Protected(true)
   @Roles(Role.ADMIN, Role.USER)

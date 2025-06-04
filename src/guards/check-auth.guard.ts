@@ -32,7 +32,7 @@ export class CheckAuthGuard implements CanActivate {
     const token = request.headers['authorization'];
 
     if (!token || !token.startsWith('Bearer')) {
-      throw new BadRequestException('please send Bearer token ✌');
+      throw new BadRequestException('please send Bearer token ');
     }
 
     const data = await this.jwtHelper.verifyToken(token.split(' ')[1]);

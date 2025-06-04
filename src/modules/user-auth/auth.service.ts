@@ -25,7 +25,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('user already exists try another');
+      throw new ConflictException('user already exists try another email');
     }
 
     const hashedPassword = await bcrypt.hash(payload.password, 10);
@@ -38,11 +38,11 @@ export class AuthService {
       },
     });
 
-    await this.mailService.sendMail({
-      to: user.email,
-      subject: `Welcome to [appname], ${user.username}!`,
-      text: `Hi ${user.username},\n\nThank you for registering with [appname]. We're excited to have you on board!\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nThe [appname] Team`,
-    });
+    // await this.mailService.sendMail({
+    //   to: user.email,
+    //   subject: `Welcome to [appname], ${user.username}!`,
+    //   text: `Hi ${user.username},\n\nThank you for registering with [appname]. We're excited to have you on board!\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nThe [appname] Team`,
+    // });
 
     return {
       message: 'success',

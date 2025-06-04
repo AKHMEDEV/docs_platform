@@ -12,7 +12,7 @@ enum Role {
   USER
   ADMIN
 }
-
+//reactions enum
 enum ReactionType {
   LIKE
   DISLIKE
@@ -38,12 +38,8 @@ model Documentation {
   views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Foreign keys
   categoryId String
   authorId   String
-
-  // Relations
   category  Category   @relation(fields: [categoryId], references: [id])
   author    User       @relation(name: "UserDocumentations", fields: [authorId], references: [id])
   comments  Comment[]
@@ -55,13 +51,9 @@ model Comment {
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Foreign keys
   authorId   String
   documentId String
   parentId   String?
-
-  // Relations
   author    User          @relation(name: "UserComments", fields: [authorId], references: [id])
   document  Documentation @relation(fields: [documentId], references: [id])
   parent    Comment?      @relation("ReplyTo", fields: [parentId], references: [id])
@@ -75,8 +67,6 @@ model Category {
   description String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relations
   documentations Documentation[]
 }
 
@@ -84,12 +74,9 @@ model Reaction {
   id        String       @id @default(uuid())
   type      ReactionType
   createdAt DateTime     @default(now())
-
   userId     String
   documentId String?
   commentId  String?
-
-  // Relations
   user     User           @relation(name: "UserReactions", fields: [userId], references: [id])
   document Documentation? @relation(fields: [documentId], references: [id])
   comment  Comment?       @relation(fields: [commentId], references: [id])
