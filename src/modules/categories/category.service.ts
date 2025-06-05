@@ -64,21 +64,17 @@ export class CategoryService {
     };
   }
 
-  // update
   async update(id: string, payload: UpdateCategoryDto) {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
       throw new NotFoundException('category not found');
     }
 
-    // check for name conflict
     if (payload.name && payload.name !== category.name) {
-      const duplicate = await this.prisma.category.findUnique({
-        where: { name: payload.name },
-      });
+      const duplicate = await this.prisma.category.findUnique({where: { name: payload.name }});
 
       if (duplicate) {
-        throw new ConflictException('Another category with this name exists');
+        throw new ConflictException('category with this namealready exists');
       }
     }
 
@@ -96,7 +92,6 @@ export class CategoryService {
     };
   }
 
-  // delete
   async delete(id: string) {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
