@@ -6,10 +6,11 @@ import {
 import { PrismaService } from 'src/prisma';
 import { GetAllDocumentationsQueryDto } from './dtos/getall-document-query.dto';
 import { CreateDocumentationDto, UpdateDocumentationDto } from './dtos';
+import { MailService } from 'src/common';
 
 @Injectable()
 export class DocumentationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private MailService:MailService) {}
 
   async getAll(query: GetAllDocumentationsQueryDto) {
     const {
@@ -73,14 +74,14 @@ export class DocumentationService {
     if (!existauthor) {
       throw new BadRequestException('author with id does not exist');
     }
-
+  
     const existcategory = await this.prisma.category.findUnique({
       where: { id: payload.categoryId },
     });
     if (!existcategory) {
       throw new BadRequestException('category with id does not exist');
     }
-
+  
     const documentation = await this.prisma.documentation.create({
       data: {
         title: payload.title,
@@ -103,13 +104,33 @@ export class DocumentationService {
         },
       },
     });
-
+  
+    // const users = await this.prisma.user.findMany({
+    //   select: { email: true },
+    // });
+  
+    // const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000/.....';
+  
+    // await Promise.all(
+    //   users.map((user) =>
+    //     this.MailService.sendMail({
+    //       to: user.email,
+    //       subject: 'Yangi dokumentatsiya qoshildi!',
+    //       html: `
+    //         <p>Salom!</p>
+    //         <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
+    //         <p>Korish uchun <a href="${frontendUrl}/documentation/${documentation.id}">shu yerga bosing</a>.</p>
+    //       `,
+    //     }),
+    //   )
+    // );
+  
     return {
       message: 'created',
       data: documentation,
     };
   }
-
+  
   async getOne(id: string) {
     const documentation = await this.prisma.documentation.findUnique({
       where: { id },

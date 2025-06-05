@@ -38,6 +38,17 @@ export class AuthService {
       },
     });
 
+    await this.mailService.sendMail({
+      to: user.email,
+      subject: 'TechDocs saytiga muvaffaqiyatli royxatdan otdingiz!',
+      html: `
+        <p>Salom <b>${user.username}</b>!</p>
+        <p>TechDocs saytimizga muvaffaqiyatli royxatdan otdingiz.</p>
+        <p>Endi siz barcha dokumentatsiyalarni korishingiz, izoh qoldirishingiz va koproq bilimga ega bolishingiz mumkin.</p>
+        <p>Hush kelibsiz!</p>
+      `,
+    });
+
     return {
       message: 'success',
       data: {
