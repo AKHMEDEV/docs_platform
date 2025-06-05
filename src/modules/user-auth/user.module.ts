@@ -20,5 +20,6 @@ import { MailModule, MailService } from 'src/common';
     PrismaService,
     MailService,
   ],
+  exports:[JwtHelper]
 })
 export class UserModule {}

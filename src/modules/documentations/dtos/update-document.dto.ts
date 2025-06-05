@@ -13,7 +13,7 @@ export class UpdateDocumentationDto {
   title?: string;
 
   @ApiPropertyOptional({
-    example: 'updated    content of the documentation',
+    example: 'updated content of the documentation',
     minLength: 20,
     maxLength: 100000,
   })
@@ -28,4 +28,11 @@ export class UpdateDocumentationDto {
   @IsOptional()
   @IsUUID()
   categoryId?: string;
+
+  @ApiPropertyOptional({
+    example: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+  })
+  @IsOptional()
+  @IsUUID()
+  authorId?: string;
 }

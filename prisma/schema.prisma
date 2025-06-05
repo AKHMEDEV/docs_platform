@@ -41,8 +41,10 @@ model Documentation {
   updatedAt  DateTime   @updatedAt
   categoryId String
   authorId   String
-  category   Category   @relation(fields: [categoryId], references: [id])
-  author     User       @relation(name: "UserDocumentations", fields: [authorId], references: [id])
+
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author     User       @relation(name: "UserDocumentations", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   comments   Comment[]
   reactions  Reaction[]
 }
@@ -55,9 +57,11 @@ model Comment {
   authorId   String
   documentId String
   parentId   String?
-  author     User          @relation(name: "UserComments", fields: [authorId], references: [id])
-  document   Documentation @relation(fields: [documentId], references: [id])
-  parent     Comment?      @relation("ReplyTo", fields: [parentId], references: [id])
+
+  author     User          @relation(name: "UserComments", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document   Documentation @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parent     Comment?      @relation("ReplyTo", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   replies    Comment[]     @relation("ReplyTo")
   reactions  Reaction[]
 }
@@ -78,7 +82,8 @@ model Reaction {
   userId     String
   documentId String?
   commentId  String?
-  user       User           @relation(name: "UserReactions", fields: [userId], references: [id])
-  document   Documentation? @relation(fields: [documentId], references: [id])
-  comment    Comment?       @relation(fields: [commentId], references: [id])
+
+  user       User           @relation(name: "UserReactions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document   Documentation? @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment    Comment?       @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

@@ -1,26 +1,29 @@
+import { IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsInt, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class GetAllDocumentationsQueryDto {
   @IsOptional()
-  @IsInt()
   @Type(() => Number)
-  page?: number = 1;
+  page?: number;
 
   @IsOptional()
-  @IsInt()
   @Type(() => Number)
-  limit?: number = 10;
+  limit?: number;
 
   @IsOptional()
   @IsString()
-  sort?: string = 'createdAt';
+  sort?: string;
 
   @IsOptional()
   @IsString()
-  order?: 'asc' | 'desc' = 'desc';
+  order?: 'asc' | 'desc';
 
   @IsOptional()
-  @IsObject()
-  filter?: Record<string, any>;
+  filter?: {
+    title?: string;
+  };
+
+  @IsOptional()
+  @IsString()
+  search?: string;
 }
