@@ -5,12 +5,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RegisterDto, LoginDto } from './dtos';
+
 import * as bcrypt from 'bcryptjs';
 import { JwtHelper } from 'src/helpers/jwt.helper';
 import { PrismaService } from 'src/prisma';
 import { MailService } from 'src/common/nodemailler';
 import { Response } from 'express';
+import { LoginDto, RegisterDto } from './dtos';
 
 @Injectable()
 export class AuthService {

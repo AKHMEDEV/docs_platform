@@ -26,7 +26,7 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'tom123',
-    minLength: 4  ,
+    minLength: 4,
   })
   @IsNotEmpty()
   @MinLength(4)

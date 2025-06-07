@@ -1,13 +1,8 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  RegisterDto,
-  LoginDto,
-  ForgotPasswordDto,
-  ResetPasswordDto,
-} from './dtos';
 import { ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './dtos';
 
 @Controller('auth')
 export class AuthController {

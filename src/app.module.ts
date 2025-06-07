@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma';
-import { UserModule } from './modules/user-auth';
+import { UserModule } from './modules/users';
 import { MailModule } from './common/nodemailler';
 import { CategoryModule } from './modules/categories';
 import { DocumentationModule } from './modules/documentations';
 import { CommentModule } from './modules/comments/coment.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { join } from 'path';
       serveRoot: '/uploads',
     }),
     PrismaModule,
+    AuthModule,
     UserModule,
     MailModule,
     CategoryModule,

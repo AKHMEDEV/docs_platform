@@ -195,6 +195,12 @@ export class UserService implements OnModuleInit {
         password: '0000',
         role: Role.ADMIN,
       },
+      {
+        username: 'JohnDoe',
+        email: 'johndoe@gmail.com',
+        password: '1111',
+        role: Role.ADMIN,
+      },
     ];
 
     for (const user of defaultUsers) {
