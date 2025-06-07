@@ -168,7 +168,7 @@ export class UserService implements OnModuleInit {
       where: { id: userId },
     });
 
-    if (!user) throw new NotFoundException('User topilmadi');
+    if (!user) throw new NotFoundException('user not found');
 
     if (user.image) {
       await this.fshelper.removeFiles(user.image);
@@ -182,7 +182,7 @@ export class UserService implements OnModuleInit {
     });
 
     return {
-      message: 'Rasm yangilandi',
+      message: 'success',
       image: fileUrl,
     };
   }
