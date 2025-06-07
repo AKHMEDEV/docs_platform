@@ -1,6 +1,11 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dtos';
+import {
+  RegisterDto,
+  LoginDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dtos';
 import { ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -24,13 +29,25 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiOperation({ summary: 'refresh acces refrsh tokens' })
+  @ApiOperation({ summary: 'refresh tokens' })
   async refresh(@Body('refreshToken') refreshToken: string) {
     const tokens = await this.authService.refreshToken(refreshToken);
     return {
       message: 'token updated',
       ...tokens,
     };
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'forgot password' })
+  async forgotPassword(@Body() payload: ForgotPasswordDto) {
+    return this.authService.forgotPassword(payload.email);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'reset password' })
+  async resetPassword(@Body() payload: ResetPasswordDto) {
+    return this.authService.resetPassword(payload.token, payload.newPassword);
   }
 
   @Post('logout')

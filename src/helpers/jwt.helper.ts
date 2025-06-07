@@ -22,10 +22,7 @@ export class JwtHelper {
       expiresIn: process.env.REFRESH_TOKEN_TIME || '7d',
     });
 
-    return {
-      accessToken,
-      refreshToken,
-    };  
+    return { accessToken, refreshToken };
   }
 
   async verifyAccessToken(token: string) {
@@ -57,6 +54,31 @@ export class JwtHelper {
         throw new BadRequestException('Refresh token formati notogri');
       }
       throw new InternalServerErrorException('Token tekshirishda xatolik');
+    }
+  }
+
+  async generateResetToken(payload: { id: string }) {
+    return await this.jwt.signAsync(payload, {
+      secret: process.env.RESET_TOKEN_SECRET,
+      expiresIn: process.env.RESET_TOKEN_EXPIRE,
+    });
+  }
+
+  async verifyResetToken(token: string) {
+    try {
+      return await this.jwt.verifyAsync(token, {
+        secret: process.env.RESET_TOKEN_SECRET,
+      });
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new ForbiddenException('Reset token muddati tugagan');
+      }
+      if (error instanceof JsonWebTokenError) {
+        throw new BadRequestException('Reset token yaroqsiz');
+      }
+      throw new InternalServerErrorException(
+        'Reset token tekshirishda xatolik',
+      );
     }
   }
 }

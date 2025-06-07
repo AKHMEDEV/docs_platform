@@ -132,6 +132,45 @@ export class AuthService {
     return tokens;
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) throw new NotFoundException('user not found');
+
+    const resetToken = await this.jwtHelper.generateResetToken({ id: user.id });
+
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+    await this.mailService.sendMail({
+      to: email,
+      subject: 'password reset',
+      html: `
+        <p>Salom <b>${user.username}</b>!</p>
+        <p>Parolingizni tiklash uchun quyidagi havolaga o'ting:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>Link 15 daqiqada tugaydi.</p>
+      `,
+    });
+
+    return { message: 'Reset link yuborildi' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const payload = await this.jwtHelper.verifyResetToken(token);
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: payload.id },
+      data: {
+        password: hashedPassword,
+        refreshToken: null,
+      },
+    });
+
+    return { message: 'password updated, please log in again' };
+  }
+
   async logout(res: Response) {
     const refreshToken = res.req.cookies?.refresh_token;
     if (!refreshToken) return;
