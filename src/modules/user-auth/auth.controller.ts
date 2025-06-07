@@ -22,4 +22,21 @@ export class AuthController {
   ) {
     await this.authService.login(payload, res);
   }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'refresh acces refrsh tokens' })
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    const tokens = await this.authService.refreshToken(refreshToken);
+    return {
+      message: 'token updated',
+      ...tokens,
+    };
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'logout user' })
+  async logout(@Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(res);
+    return { message: 'you are logged out' };
+  }
 }

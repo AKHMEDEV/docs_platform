@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -91,6 +92,11 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
+
     res.json({
       message: 'you are logined successfully',
       accessToken,
@@ -101,5 +107,46 @@ export class AuthService {
         role: user.role,
       },
     });
+  }
+
+  async refreshToken(oldRefreshToken: string) {
+    const payload = await this.jwtHelper.verifyRefreshToken(oldRefreshToken);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+    if (!user || user.refreshToken !== oldRefreshToken) {
+      throw new ForbiddenException('invalid refresh token');
+    }
+
+    const tokens = await this.jwtHelper.generateTokens({
+      id: user.id,
+      role: user.role,
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: tokens.refreshToken },
+    });
+
+    return tokens;
+  }
+
+  async logout(res: Response) {
+    const refreshToken = res.req.cookies?.refresh_token;
+    if (!refreshToken) return;
+
+    try {
+      const payload = await this.jwtHelper.verifyRefreshToken(refreshToken);
+
+      await this.prisma.user.update({
+        where: { id: payload.id },
+        data: { refreshToken: null },
+      });
+
+      res.clearCookie('refresh_token');
+    } catch (error) {
+      res.clearCookie('refresh_token');
+    }
   }
 }

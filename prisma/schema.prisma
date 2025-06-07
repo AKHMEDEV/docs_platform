@@ -25,6 +25,7 @@ model User {
   email          String          @unique
   password       String
   role           Role            @default(USER)
+  refreshToken   String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   documentations Documentation[] @relation("UserDocumentations")
@@ -33,37 +34,37 @@ model User {
 }
 
 model Documentation {
-  id         String     @id @default(uuid())
+  id         String   @id @default(uuid())
   title      String
-  content    String     @db.Text
-  views      Int        @default(0)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  content    String   @db.Text
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   categoryId String
   authorId   String
 
-  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  author     User       @relation(name: "UserDocumentations", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author   User     @relation(name: "UserDocumentations", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  comments   Comment[]
-  reactions  Reaction[]
+  comments  Comment[]
+  reactions Reaction[]
 }
 
 model Comment {
-  id         String        @id @default(uuid())
-  content    String        @db.Text
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id         String   @id @default(uuid())
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   authorId   String
   documentId String
   parentId   String?
 
-  author     User          @relation(name: "UserComments", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  document   Documentation @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  parent     Comment?      @relation("ReplyTo", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author   User          @relation(name: "UserComments", fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document Documentation @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parent   Comment?      @relation("ReplyTo", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  replies    Comment[]     @relation("ReplyTo")
-  reactions  Reaction[]
+  replies   Comment[]  @relation("ReplyTo")
+  reactions Reaction[]
 }
 
 model Category {
@@ -76,14 +77,14 @@ model Category {
 }
 
 model Reaction {
-  id         String         @id @default(uuid())
+  id         String       @id @default(uuid())
   type       ReactionType
-  createdAt  DateTime       @default(now())
+  createdAt  DateTime     @default(now())
   userId     String
   documentId String?
   commentId  String?
 
-  user       User           @relation(name: "UserReactions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  document   Documentation? @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  comment    Comment?       @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user     User           @relation(name: "UserReactions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document Documentation? @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment  Comment?       @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
