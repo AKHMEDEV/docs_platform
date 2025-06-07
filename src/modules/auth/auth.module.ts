@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthController } from '../auth/auth.controller';
 import { AuthService } from '../auth/auth.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { FsHelper, JwtHelper } from 'src/helpers';
 import { PrismaModule, PrismaService } from 'src/prisma';
 import { MailModule, MailService } from 'src/common';
