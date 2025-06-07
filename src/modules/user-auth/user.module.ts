@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { JwtHelper } from 'src/helpers';
+import { FsHelper, JwtHelper } from 'src/helpers';
 import { PrismaModule, PrismaService } from 'src/prisma';
 import { MailModule, MailService } from 'src/common';
 
@@ -16,10 +16,11 @@ import { MailModule, MailService } from 'src/common';
     AuthService,
     JwtService,
     JwtHelper,
+    FsHelper,
     UserService,
     PrismaService,
     MailService,
   ],
-  exports:[JwtHelper]
+  exports:[JwtHelper,FsHelper]
 })
 export class UserModule {}

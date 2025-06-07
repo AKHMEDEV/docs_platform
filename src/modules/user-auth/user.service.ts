@@ -8,10 +8,14 @@ import * as bcrypt from 'bcryptjs';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
+import { FsHelper } from 'src/helpers';
 
 @Injectable()
 export class UserService implements OnModuleInit {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private fshelper: FsHelper,
+  ) {}
 
   async onModuleInit() {
     await this.seedUsers();
@@ -20,45 +24,52 @@ export class UserService implements OnModuleInit {
   async getAll() {
     const users = await this.prisma.user.findMany({
       include: {
-        documentations: {select: { id: true, title: true, views: true, reactions: true },},
-        comments: {select: { id: true, content: true },},
+        documentations: {
+          select: { id: true, title: true, views: true, reactions: true },
+        },
+        comments: { select: { id: true, content: true } },
       },
     });
-    return{
-      count:users.length,
-      data:users
-    }
+    return {
+      count: users.length,
+      data: users,
+    };
   }
 
   async getOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        documentations: {select: { id: true, title: true, views: true, reactions: true }},
-        comments: {select: { id: true, content: true }}}
-    })
-    return user
+        documentations: {
+          select: { id: true, title: true, views: true, reactions: true },
+        },
+        comments: { select: { id: true, content: true } },
+      },
+    });
+    return user;
   }
 
   async getMe(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        documentations: { select: { id: true, title: true, views: true, reactions: true } },
+        documentations: {
+          select: { id: true, title: true, views: true, reactions: true },
+        },
         comments: { select: { id: true, content: true, createdAt: true } },
       },
     });
-  
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-  
+
     return {
       message: 'User data retrieved successfully',
       data: user,
     };
   }
-  
+
   async create(payload: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: payload.email },
@@ -149,6 +160,30 @@ export class UserService implements OnModuleInit {
     return {
       message: 'deleted',
       data: existingUser,
+    };
+  }
+
+  async updateUserImage(userId: string, file: Express.Multer.File) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User topilmadi');
+
+    if (user.image) {
+      await this.fshelper.removeFiles(user.image);
+    }
+
+    const { fileUrl } = await this.fshelper.uploadFile(file);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { image: fileUrl },
+    });
+
+    return {
+      message: 'Rasm yangilandi',
+      image: fileUrl,
     };
   }
 

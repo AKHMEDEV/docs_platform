@@ -8,13 +8,22 @@ import {
   Body,
   UseGuards,
   Req,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dtos';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { Protected, Roles } from 'src/decorators';
 import { Role } from '@prisma/client';
 import { CheckAuthGuard } from 'src/guards';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UserController {
@@ -57,5 +66,16 @@ export class UserController {
   @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.userService.delete(id);
+  }
+
+  @Patch('upload-image')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({schema: {type: 'object',properties: {file: { type: 'string', format: 'binary' },id: { type: 'string' },},},})
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('id') id: string,
+  ) {
+    return this.userService.updateUserImage(id, file);
   }
 }
