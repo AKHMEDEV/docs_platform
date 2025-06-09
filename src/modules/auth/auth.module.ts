@@ -5,9 +5,15 @@ import { JwtService } from '@nestjs/jwt';
 import { FsHelper, JwtHelper } from 'src/helpers';
 import { PrismaModule, PrismaService } from 'src/prisma';
 import { MailModule, MailService } from 'src/common';
+import { GoogleStrategy } from './strategy/google-strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [PrismaModule, MailModule],
+  imports: [
+    PrismaModule,
+    MailModule,
+    PassportModule.register({ defaultStrategy: 'google' }),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -16,7 +22,8 @@ import { MailModule, MailService } from 'src/common';
     FsHelper,
     PrismaService,
     MailService,
+    GoogleStrategy,
   ],
-  exports:[JwtHelper,FsHelper]
+  exports: [JwtHelper, FsHelper, PassportModule],
 })
 export class AuthModule {}

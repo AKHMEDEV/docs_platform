@@ -105,25 +105,25 @@ export class DocumentationService {
       },
     });
   
-    // const users = await this.prisma.user.findMany({
-    //   select: { email: true },
-    // });
+    const users = await this.prisma.user.findMany({
+      select: {username:true,email:true},
+    });
+      
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000/';
   
-    // const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000/.....';
-  
-    // await Promise.all(
-    //   users.map((user) =>
-    //     this.MailService.sendMail({
-    //       to: user.email,
-    //       subject: 'Yangi dokumentatsiya qoshildi!',
-    //       html: `
-    //         <p>Salom!</p>
-    //         <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
-    //         <p>Korish uchun <a href="${frontendUrl}/documentation/${documentation.id}">shu yerga bosing</a>.</p>
-    //       `,
-    //     }),
-    //   )
-    // );
+    await Promise.all(
+      users.map((user) =>
+        this.MailService.sendMail({
+          to: user.email,
+          subject: 'Yangi dokumentatsiya qoshildi!',
+          html: `
+            <p>Salom${user.username}</p>
+            <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
+            <p>Korish uchun <a href="${frontendUrl}/documentation/${documentation.id}">shu yerga bosing</a>.</p>
+          `,
+        }),
+      )
+    );
   
     return {
       message: 'created',

@@ -6,13 +6,13 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('/api');
+  // app.setGlobalPrefix('/api');
 
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: 'v',
-  });
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  //   defaultVersion: '1',
+  //   prefix: 'v',
+  // });
 
   app.enableCors({
     allowedHeaders: ['authorization'],

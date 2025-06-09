@@ -1,8 +1,22 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './dtos';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dtos';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -50,5 +64,15 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     await this.authService.logout(res);
     return { message: 'you are logged out' };
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+    return this.authService.googleLogin(req.user, res);
   }
 }

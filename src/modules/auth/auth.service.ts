@@ -15,6 +15,7 @@ import { LoginDto, RegisterDto } from './dtos';
 
 @Injectable()
 export class AuthService {
+  [x: string]: any;
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtHelper: JwtHelper,
@@ -189,4 +190,48 @@ export class AuthService {
       res.clearCookie('refresh_token');
     }
   }
+
+  async googleLogin(googleUser: any, res: Response) {
+    const { email, username } = googleUser;
+  
+    let user = await this.prisma.user.findUnique({ where: { email } });
+  
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          username,
+          email,
+          password: 'null',
+          role: 'USER',
+        },
+      });
+  
+      // await this.mailService.sendMail({
+      //   to: user.email,
+      //   subject: 'Google orqali muvaffaqiyatli ro‘yxatdan o‘tdingiz!',
+      //   html: `<p>Salom <b>${user.username}</b>!</p><p>TechDocs saytimizga Google orqali muvaffaqiyatli ro‘yxatdan o‘tdingiz.</p>`,
+      // });
+    }
+  
+    const { accessToken, refreshToken } = await this.jwtHelper.generateTokens({
+      id: user.id,
+      role: user.role,
+    });
+  
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
+  
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  
+    res.redirect(`${this.config.get('CLIENT_URL')}/google-success?accessToken=${accessToken}`);
+  }
+  
+  
 }
