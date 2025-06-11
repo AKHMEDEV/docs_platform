@@ -23,7 +23,7 @@ model User {
   id             String          @id @default(uuid())
   username       String
   email          String          @unique
-  password       String
+  password       String?
   role           Role            @default(USER)
   refreshToken   String?
   image          String?
@@ -64,8 +64,7 @@ model Comment {
   document Documentation @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   parent   Comment?      @relation("ReplyTo", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  replies   Comment[]  @relation("ReplyTo")
-  reactions Reaction[]
+  replies Comment[] @relation("ReplyTo")
 }
 
 model Category {
@@ -79,13 +78,13 @@ model Category {
 
 model Reaction {
   id         String       @id @default(uuid())
-  type       ReactionType
+  type       ReactionType @default(DISLIKE)
   createdAt  DateTime     @default(now())
   userId     String
-  documentId String?
-  commentId  String?
+  documentId String
 
-  user     User           @relation(name: "UserReactions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  document Documentation? @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  comment  Comment?       @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user     User          @relation(name: "UserReactions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document Documentation @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, documentId])
 }

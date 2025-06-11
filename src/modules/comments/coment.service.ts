@@ -15,12 +15,14 @@ export class CommentService {
     const comments = await this.prisma.comment.findMany({
       include: {
         author: {
-          select: { id: true, username: true },
+          select: { username: true },
         },
         document: {
           select: { id: true, title: true },
         },
-        parent: true,
+        parent: {
+          select: { content: true },
+        },
         replies: true,
       },
       orderBy: {
@@ -29,7 +31,7 @@ export class CommentService {
     });
 
     return {
-      count:comments.length,
+      count: comments.length,
       data: comments,
     };
   }
@@ -92,7 +94,7 @@ export class CommentService {
       data: comment,
     };
   }
-  
+
   async update(id: string, userId: string, payload: UpdateCommentDto) {
     const existComment = await this.prisma.comment.findUnique({
       where: { id },

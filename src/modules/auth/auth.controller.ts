@@ -76,3 +76,4 @@ export class AuthController {
     return this.authService.googleLogin(req.user, res);
   }
 }
+  

@@ -31,8 +31,8 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'development') {
     const config = new DocumentBuilder()
-      .setTitle('Documentation platform')
-      .setDescription('The CodeDocs')
+      .setTitle('TechDocs')
+      .setDescription('The TechDocs')
       .setVersion('1.0')
       .addBearerAuth()
       .build();

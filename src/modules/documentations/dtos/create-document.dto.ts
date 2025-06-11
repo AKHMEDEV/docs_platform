@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDocumentationDto {
   @ApiProperty({
-    example: 'My Documentation Title',
+    example: 'New documentation title',
     minLength: 5,
     maxLength: 100,
   })
@@ -13,7 +13,7 @@ export class CreateDocumentationDto {
   title: string;
 
   @ApiProperty({
-    example: 'This is the detailed content of the documentation',
+    example: 'This is  a content new documentation',
     minLength: 20,
     maxLength: 100000,
   })
@@ -22,16 +22,12 @@ export class CreateDocumentationDto {
   @Length(20, 100000)
   content: string;
 
-  @ApiProperty({
-    example: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-  })
+  @ApiProperty({ type: 'string' })
   @IsNotEmpty()
   @IsUUID()
   categoryId: string;
 
-  @ApiProperty({
-    example: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-  })
+  @ApiProperty({ type: 'string' })
   @IsNotEmpty()
   @IsUUID()
   authorId: string;

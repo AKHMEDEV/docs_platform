@@ -13,7 +13,7 @@ export class MailService {
         pass: process.env.MAIL_PASSWORD,
       },
     });
-  } 
+  }
 
   async sendMail({ to, subject, text = '', html = '' }) {
     try {
@@ -26,7 +26,7 @@ export class MailService {
       });
 
       return info.messageId;
-    } catch (error) {   
+    } catch (error) {
       console.log(error);
       throw new Error('Email yuborishda xatolik yuz berdi');
     }

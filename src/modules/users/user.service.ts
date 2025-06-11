@@ -50,24 +50,8 @@ export class UserService implements OnModuleInit {
   }
 
   async getMe(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      include: {
-        documentations: {
-          select: { id: true, title: true, views: true, reactions: true },
-        },
-        comments: { select: { id: true, content: true, createdAt: true } },
-      },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return {
-      message: 'User data retrieved successfully',
-      data: user,
-    };
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    return user;
   }
 
   async create(payload: CreateUserDto) {
@@ -190,15 +174,9 @@ export class UserService implements OnModuleInit {
   async seedUsers() {
     const defaultUsers = [
       {
-        username: 'akhmed',
-        email: 'ahmadillohasanov099@gmail.com',
-        password: '0000',
-        role: Role.ADMIN,
-      },
-      {
         username: 'JohnDoe',
         email: 'johndoe@gmail.com',
-        password: '1111',
+        password: '0000',
         role: Role.ADMIN,
       },
     ];
@@ -221,6 +199,6 @@ export class UserService implements OnModuleInit {
       }
     }
 
-    console.log('admin created 🟢');
+    console.log('admins created 🟢');
   }
 }

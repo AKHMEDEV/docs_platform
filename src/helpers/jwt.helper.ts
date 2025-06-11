@@ -60,7 +60,7 @@ export class JwtHelper {
   async generateResetToken(payload: { id: string }) {
     return await this.jwt.signAsync(payload, {
       secret: process.env.RESET_TOKEN_SECRET,
-      expiresIn: process.env.RESET_TOKEN_EXPIRE,
+      expiresIn: Number(process.env.RESET_TOKEN_TIME) || 900,
     });
   }
 

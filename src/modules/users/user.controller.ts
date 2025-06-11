@@ -21,9 +21,9 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { Protected, Roles } from 'src/decorators';
-import { Role } from '@prisma/client';
 import { CheckAuthGuard } from 'src/guards';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CheckFileSizePipe } from './pipes';
 
 @Controller('users')
 export class UserController {
@@ -41,11 +41,10 @@ export class UserController {
   async getOne(@Param('id') id: string) {
     return this.userService.getOne(id);
   }
-  @UseGuards(CheckAuthGuard)
-  @Get('me')
-  async getMe(@Req() req) {
-    const userId = req.user.id;
-    return this.userService.getMe(userId);
+  @Get(':id')
+  @ApiOperation({ summary: 'Me' })
+  async getMe(@Param('id') id:string) {
+    return this.userService.getMe(id);
   }
 
   @Protected(true)
@@ -71,9 +70,17 @@ export class UserController {
   @Patch('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({schema: {type: 'object',properties: {file: { type: 'string', format: 'binary' },id: { type: 'string' },},},})
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        id: { type: 'string' },
+      },
+    },
+  })
   async uploadImage(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new CheckFileSizePipe(1)) file: Express.Multer.File,
     @Body('id') id: string,
   ) {
     return this.userService.updateUserImage(id, file);

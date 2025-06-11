@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma';
 import { MailService } from 'src/common/nodemailler';
 import { Response } from 'express';
 import { LoginDto, RegisterDto } from './dtos';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtHelper: JwtHelper,
     private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   async register(payload: RegisterDto) {
@@ -45,8 +47,8 @@ export class AuthService {
       to: user.email,
       subject: 'TechDocs saytiga muvaffaqiyatli royxatdan otdingiz!',
       html: `
-        <p>Salom <b>${user.username}</b>!</p>
-        <p>TechDocs saytimizga muvaffaqiyatli royxatdan otdingiz.</p>
+        <p>Salom<b>${user.username}!</b></p>
+        <p>Siz TechDocs saytimizga muvaffaqiyatli royxatdan otdingiz.</p>
         <p>Endi siz barcha dokumentatsiyalarni korishingiz, izoh qoldirishingiz va koproq bilimga ega bolishingiz mumkin.</p>
         <p>Hush kelibsiz!</p>
       `,
@@ -71,6 +73,11 @@ export class AuthService {
 
     if (!user) {
       throw new NotFoundException('user not found');
+    }
+    if (!user.password) {
+      throw new UnauthorizedException(
+        'bu foydalanuvchi parol bilan royxatdan otmagan google orqali kiring',
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -154,7 +161,7 @@ export class AuthService {
       `,
     });
 
-    return { message: 'Reset link yuborildi' };
+    return { message: 'Emailingizga parolni yangilash uchun link yuborildi' };
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -193,45 +200,46 @@ export class AuthService {
 
   async googleLogin(googleUser: any, res: Response) {
     const { email, username } = googleUser;
-  
+
     let user = await this.prisma.user.findUnique({ where: { email } });
-  
+
     if (!user) {
       user = await this.prisma.user.create({
         data: {
           username,
           email,
-          password: 'null',
+          password: null as any,
           role: 'USER',
         },
       });
-  
-      // await this.mailService.sendMail({
-      //   to: user.email,
-      //   subject: 'Google orqali muvaffaqiyatli ro‘yxatdan o‘tdingiz!',
-      //   html: `<p>Salom <b>${user.username}</b>!</p><p>TechDocs saytimizga Google orqali muvaffaqiyatli ro‘yxatdan o‘tdingiz.</p>`,
-      // });
+
+      await this.mailService.sendMail({
+        to: user.email,
+        subject: 'Google orqali muvaffaqiyatli royxatdan otdingiz!',
+        html: `<p>Salom <b>${user.username}</b>!</p><p>TechDocs saytimizga Google orqali muvaffaqiyatli royxatdan otdingiz.</p>`,
+      });
     }
-  
+
     const { accessToken, refreshToken } = await this.jwtHelper.generateTokens({
       id: user.id,
       role: user.role,
     });
-  
+
     await this.prisma.user.update({
       where: { id: user.id },
       data: { refreshToken },
     });
-  
+
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-  
-    res.redirect(`${this.config.get('CLIENT_URL')}/google-success?accessToken=${accessToken}`);
+
+    return res.json({
+      message: 'royhatdan otdingiz ',
+      accessToken,
+    });
   }
-  
-  
 }

@@ -10,12 +10,15 @@ import { MailService } from 'src/common';
 
 @Injectable()
 export class DocumentationService {
-  constructor(private readonly prisma: PrismaService, private MailService:MailService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private MailService: MailService,
+  ) {}
 
   async getAll(query: GetAllDocumentationsQueryDto) {
     const {
       page = 1,
-      limit = 30,
+      limit = 10,
       sort = 'createdAt',
       order = 'asc',
       filter = {},
@@ -36,10 +39,7 @@ export class DocumentationService {
     }
 
     if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } },
-      ];
+      where.OR = [{ title: { contains: search, mode: 'insensitive' } }];
     }
 
     const [totalCount, docs] = await Promise.all([
@@ -50,8 +50,9 @@ export class DocumentationService {
         take: Number(limit),
         orderBy: { [sort]: order },
         include: {
-          category: { select: { id: true, name: true } },
-          author: { select: { id: true, username: true, role: true } },
+          category: { select: { name: true } },
+          author: { select: { username: true } },
+          reactions: { select: { type: true } },
         },
       }),
     ]);
@@ -74,14 +75,14 @@ export class DocumentationService {
     if (!existauthor) {
       throw new BadRequestException('author with id does not exist');
     }
-  
+
     const existcategory = await this.prisma.category.findUnique({
       where: { id: payload.categoryId },
     });
     if (!existcategory) {
       throw new BadRequestException('category with id does not exist');
     }
-  
+
     const documentation = await this.prisma.documentation.create({
       data: {
         title: payload.title,
@@ -104,33 +105,33 @@ export class DocumentationService {
         },
       },
     });
-  
+
     const users = await this.prisma.user.findMany({
-      select: {username:true,email:true},
+      select: { username: true, email: true },
     });
-      
+
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000/';
-  
+
     await Promise.all(
       users.map((user) =>
         this.MailService.sendMail({
           to: user.email,
-          subject: 'Yangi dokumentatsiya qoshildi!',
+          subject: 'yangi dokumentatsiya qoshildi!',
           html: `
-            <p>Salom${user.username}</p>
+            <p>Salom ${user.username}</p>
             <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
-            <p>Korish uchun <a href="${frontendUrl}/documentation/${documentation.id}">shu yerga bosing</a>.</p>
+            <p>Korish uchun <a href="http://localhost:4000/docs#/Documentation/DocumentationController_getAll">shu yerga bosing</a>.</p>
           `,
         }),
-      )
+      ),
     );
-  
+
     return {
       message: 'created',
       data: documentation,
     };
   }
-  
+
   async getOne(id: string) {
     const documentation = await this.prisma.documentation.findUnique({
       where: { id },
@@ -159,7 +160,6 @@ export class DocumentationService {
           select: {
             id: true,
             userId: true,
-            commentId: true,
           },
         },
       },
