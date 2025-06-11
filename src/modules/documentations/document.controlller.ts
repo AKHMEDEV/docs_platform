@@ -23,7 +23,7 @@ export class DocumentationController {
   constructor(private readonly service: DocumentationService) {}
 
   @Protected()
-  @Roles(Role.ADMIN,Role.USER)
+  @Roles(Role.ADMIN, Role.USER)
   @UseGuards(CheckAuthGuard, CheckRolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'get all' })
@@ -61,5 +61,10 @@ export class DocumentationController {
   @Delete(':id')
   async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.delete(id);
+  }
+
+  @Get(':id/view')
+  async viewDocument(@Param('id') documentId: string) {
+    return this.service.icrementView(documentId);
   }
 }

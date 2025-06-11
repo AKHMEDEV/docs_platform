@@ -25,7 +25,9 @@ export class UserService implements OnModuleInit {
     const users = await this.prisma.user.findMany({
       include: {
         documentations: {
-          select: { id: true, title: true, views: true, reactions: true },
+          select: { id: true, title: true, views: true, reactions: {
+            select:{type:true}
+          } },
         },
         comments: { select: { id: true, content: true } },
       },

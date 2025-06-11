@@ -219,4 +219,19 @@ export class DocumentationService {
       message: 'deleted',
     };
   }
+
+  async icrementView(documentId: string) {
+    await this.prisma.documentation.update({
+      where: { id: documentId },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
+    return this.prisma.documentation.findUnique({
+      where: { id: documentId },
+    });
+  }
 }
