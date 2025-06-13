@@ -15,10 +15,7 @@ async function bootstrap() {
   // });
 
   app.enableCors({
-    allowedHeaders: ['authorization'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    optionsSuccessStatus: 200,
-    origin: process.env.CORS_ORIGIN,
+    origin: '*',
   });
 
   app.useGlobalPipes(

@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { ReactionModule } from './modules/reactions/reaction.module';
+import { ExelModule } from './exel/exel.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ReactionModule } from './modules/reactions/reaction.module';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
+
     PrismaModule,
     AuthModule,
     UserModule,
@@ -27,7 +29,8 @@ import { ReactionModule } from './modules/reactions/reaction.module';
     CategoryModule,
     DocumentationModule,
     CommentModule,
-    ReactionModule
+    ReactionModule,
+    ExelModule,
   ],
 })
 export class AppModule {}

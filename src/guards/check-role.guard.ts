@@ -24,8 +24,6 @@ export class CheckRolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    console.log(user,"role bu");
-    
 
     if (!user || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException('ruxsat yoq');

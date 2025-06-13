@@ -25,9 +25,14 @@ export class UserService implements OnModuleInit {
     const users = await this.prisma.user.findMany({
       include: {
         documentations: {
-          select: { id: true, title: true, views: true, reactions: {
-            select:{type:true}
-          } },
+          select: {
+            id: true,
+            title: true,
+            views: true,
+            reactions: {
+              select: { type: true },
+            },
+          },
         },
         comments: { select: { id: true, content: true } },
       },
@@ -176,8 +181,8 @@ export class UserService implements OnModuleInit {
   async seedUsers() {
     const defaultUsers = [
       {
-        username: 'JohnDoe',
-        email: 'johndoe@gmail.com',
+        username: 'ahmed',
+        email: 'ahmed@gmail.com',
         password: '0000',
         role: Role.ADMIN,
       },

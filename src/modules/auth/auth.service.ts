@@ -237,9 +237,6 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.json({
-      message: 'royhatdan otdingiz ',
-      accessToken,
-    });
+    return res.redirect(`http://localhost:5500/main.html?token=${accessToken}`);
   }
 }
