@@ -14,7 +14,15 @@ export class CategoryService {
           where: { lang },
           select: { name: true, description: true },
         },
-        documentations: true,
+        documentations: {
+          select: {
+            id: true,
+            authorId: true,
+            title: true,
+            content: true,
+            views: true,
+          },
+        },
       },
     });
 
@@ -40,12 +48,20 @@ export class CategoryService {
           where: { lang },
           select: { name: true, description: true },
         },
-        documentations: true,
+        documentations: {
+          select: {
+            id: true,
+            authorId: true,
+            title: true,
+            content: true,
+            views: true,
+          },
+        },
       },
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('category not found');
     }
 
     return {
@@ -89,7 +105,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('category not found');
     }
 
     if (payload.translations?.length) {
@@ -118,7 +134,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('category not found');
     }
 
     await this.prisma.category.delete({

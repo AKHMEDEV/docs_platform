@@ -80,7 +80,7 @@ export class UserController {
     },
   })
   async uploadImage(
-    @UploadedFile(new CheckFileSizePipe(1)) file: Express.Multer.File,
+    @UploadedFile(new CheckFileSizePipe(5)) file: Express.Multer.File,
     @Body('id') id: string,
   ) {
     return this.userService.updateUserImage(id, file);
