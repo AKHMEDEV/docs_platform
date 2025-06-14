@@ -19,6 +19,13 @@ enum ReactionType {
   DISLIKE
 }
 
+//language enum
+enum Language {
+  uz
+  ru
+  en
+}
+
 model User {
   id             String          @id @default(uuid())
   username       String
@@ -68,12 +75,23 @@ model Comment {
 }
 
 model Category {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  description    String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id             String                @id @default(uuid())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
   documentations Documentation[]
+  translations   CategoryTranslation[]
+}
+
+model CategoryTranslation {
+  id          String   @id @default(uuid())
+  lang        Language @default(uz)
+  name        String
+  description String
+  categoryId  String
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([lang, categoryId])
 }
 
 model Reaction {

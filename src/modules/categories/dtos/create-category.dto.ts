@@ -1,18 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CategoryTranslationDto } from './category-translation.sto';
 
 export class CreateCategoryDto {
-  @ApiProperty({
-    example: 'Backend',
-  })
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @ApiProperty({
-    example: 'Node.js, Express, PostgreSQL haqida hujjatlar',
-  })
-  @IsNotEmpty()
-  @IsString()
-  description: string;
+  @ApiProperty({ type: [CategoryTranslationDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CategoryTranslationDto)
+  translations: CategoryTranslationDto[];
 }

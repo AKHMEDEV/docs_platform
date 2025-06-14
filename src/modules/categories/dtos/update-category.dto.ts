@@ -1,18 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, ValidateNested, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CategoryTranslationDto } from './category-translation.sto';
 
 export class UpdateCategoryDto {
-  @ApiPropertyOptional({
-    example: 'Backend',
-  })
+  @ApiPropertyOptional({ type: [CategoryTranslationDto] })
   @IsOptional()
-  @IsString()
-  name?: string;
-
-  @ApiPropertyOptional({
-    example: 'Node.js, Express, PostgreSQL haqida hujjatlar',
-  })
-  @IsOptional()
-  @IsString()
-  description?: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CategoryTranslationDto)
+  translations?: CategoryTranslationDto[];
 }

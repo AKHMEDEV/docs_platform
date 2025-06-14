@@ -10,7 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { ReactionModule } from './modules/reactions/reaction.module';
-import { ExelModule } from './exel/exel.module';
+import { ExelModule } from './modules/exel/exel.module';
 
 @Module({
   imports: [

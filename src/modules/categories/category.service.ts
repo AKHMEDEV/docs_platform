@@ -1,101 +1,124 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos';
+import { Language } from '@prisma/client';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAll() {
+  async getAll(lang: Language = 'uz') {
     const categories = await this.prisma.category.findMany({
       include: {
+        translations: {
+          where: { lang },
+          select: { name: true, description: true },
+        },
         documentations: true,
       },
     });
 
+    const data = categories.map((cat) => ({
+      id: cat.id,
+      name: cat.translations[0]?.name || null,
+      description: cat.translations[0]?.description || null,
+      documentations: cat.documentations,
+    }));
+
     return {
       message: 'success',
-      count: categories.length,
-      data: categories,
+      count: data.length,
+      data,
     };
   }
 
-  async getOne(id: string) {
+  async getOne(id: string, lang: Language = 'uz') {
     const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
+        translations: {
+          where: { lang },
+          select: { name: true, description: true },
+        },
         documentations: true,
       },
     });
 
     if (!category) {
-      throw new NotFoundException('cateory not found');
+      throw new NotFoundException('Category not found');
     }
 
     return {
       message: 'success',
-      data: category,
+      data: {
+        id: category.id,
+        name: category.translations[0]?.name || null,
+        description: category.translations[0]?.description || null,
+        documentations: category.documentations,
+      },
     };
   }
 
   async create(payload: CreateCategoryDto) {
-    const exists = await this.prisma.category.findUnique({
-      where: { name: payload.name },
-    });
-
-    if (exists) {
-      throw new ConflictException('category with this name already exists');
-    }
-
     const category = await this.prisma.category.create({
       data: {
-        name: payload.name,
-        description: payload.description,
+        translations: {
+          createMany: {
+            data: payload.translations.map((t) => ({
+              lang: t.lang,
+              name: t.name,
+              description: t.description,
+            })),
+          },
+        },
+      },
+      include: {
+        translations: true,
       },
     });
 
     return {
-      message: 'succes',
+      message: 'created',
       data: category,
     };
   }
 
   async update(id: string, payload: UpdateCategoryDto) {
-    const category = await this.prisma.category.findUnique({ where: { id } });
-    if (!category) {
-      throw new NotFoundException('category not found');
-    }
-
-    if (payload.name && payload.name !== category.name) {
-      const duplicate = await this.prisma.category.findUnique({where: { name: payload.name }});
-
-      if (duplicate) {
-        throw new ConflictException('category with this namealready exists');
-      }
-    }
-
-    const updatedCategory = await this.prisma.category.update({
+    const category = await this.prisma.category.findUnique({
       where: { id },
-      data: {
-        name: payload.name,
-        description: payload.description,
-      },
     });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    if (payload.translations?.length) {
+      await this.prisma.categoryTranslation.deleteMany({
+        where: { categoryId: id },
+      });
+
+      await this.prisma.categoryTranslation.createMany({
+        data: payload.translations.map((t) => ({
+          lang: t.lang,
+          name: t.name,
+          description: t.description,
+          categoryId: id,
+        })),
+      });
+    }
 
     return {
       message: 'updated',
-      data: updatedCategory,
     };
   }
 
   async delete(id: string) {
-    const category = await this.prisma.category.findUnique({ where: { id } });
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
     if (!category) {
-      throw new NotFoundException('category not found');
+      throw new NotFoundException('Category not found');
     }
 
     await this.prisma.category.delete({
@@ -103,8 +126,7 @@ export class CategoryService {
     });
 
     return {
-      message: 'category deleted',
-      data: category,
+      message: 'deleted',
     };
   }
 }

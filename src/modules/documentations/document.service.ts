@@ -50,7 +50,16 @@ export class DocumentationService {
         take: Number(limit),
         orderBy: { [sort]: order },
         include: {
-          category: { select: { name: true } },
+          category: {
+            select: {
+              id: true,
+              translations: {
+                where: { lang: 'uz' },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
           author: { select: { username: true } },
           reactions: { select: { type: true } },
         },
@@ -100,7 +109,12 @@ export class DocumentationService {
         },
         category: {
           select: {
-            name: true,
+            id: true,
+            translations: {
+              where: { lang: 'uz' },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
       },
@@ -120,7 +134,7 @@ export class DocumentationService {
           html: `
             <p>Salom ${user.username}</p>
             <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
-            <p>Korish uchun <a href="http://localhost:4000/docs#/Documentation/DocumentationController_getAll">shu yerga bosing</a>.</p>
+            <p>Korish uchun <a href="${frontendUrl}docs#/Documentation/DocumentationController_getAll">shu yerga bosing</a>.</p>
           `,
         }),
       ),
@@ -139,7 +153,11 @@ export class DocumentationService {
         category: {
           select: {
             id: true,
-            name: true,
+            translations: {
+              where: { lang: 'uz' },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
         author: {
@@ -180,13 +198,14 @@ export class DocumentationService {
     if (!existing) throw new NotFoundException('not found');
 
     if (payload.categoryId) {
-      const categroy = await this.prisma.category.findUnique({
+      const category = await this.prisma.category.findUnique({
         where: { id: payload.categoryId },
       });
-      if (!categroy) throw new NotFoundException('category not found');
+      if (!category) throw new NotFoundException('category not found');
     }
+
     if (payload.authorId) {
-      const author = await this.prisma.category.findUnique({
+      const author = await this.prisma.user.findUnique({
         where: { id: payload.authorId },
       });
       if (!author) throw new NotFoundException('author not found');
@@ -196,10 +215,24 @@ export class DocumentationService {
       where: { id },
       data: payload,
       include: {
-        category: { select: { id: true, name: true } },
+        category: {
+          select: {
+            id: true,
+            translations: {
+              where: { lang: 'uz' },
+              select: { name: true },
+              take: 1,
+            },
+          },
+        },
         author: { select: { id: true, username: true, role: true } },
       },
     });
+
+    return {
+      message: 'updated',
+      data: updated,
+    };
   }
 
   async delete(id: string) {
