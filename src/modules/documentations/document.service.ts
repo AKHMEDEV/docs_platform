@@ -52,7 +52,6 @@ export class DocumentationService {
         include: {
           category: {
             select: {
-              id: true,
               translations: {
                 where: { lang: 'uz' },
                 select: { name: true },
