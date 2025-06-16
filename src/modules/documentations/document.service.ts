@@ -123,7 +123,7 @@ export class DocumentationService {
       select: { username: true, email: true },
     });
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000/';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://127.0.0.1:5500/main.html';
 
     await Promise.all(
       users.map((user) =>
@@ -133,7 +133,7 @@ export class DocumentationService {
           html: `
             <p>Salom ${user.username}</p>
             <p>Yangi dokumentatsiya <b>"${documentation.title}"</b> qoshildi.</p>
-            <p>Korish uchun <a href="${frontendUrl}docs#/Documentation/DocumentationController_getAll">shu yerga bosing</a>.</p>
+            <p>Korish uchun <a href="${frontendUrl}">shu yerga bosing</a>.</p>
           `,
         }),
       ),
